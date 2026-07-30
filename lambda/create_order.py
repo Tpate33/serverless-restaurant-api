@@ -1,3 +1,11 @@
+import uuid
+import boto3
+
+
+
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("RestaurantOrders")
+
 def lambda_handler(event, context):
     """
     Validate a restaurant order and return an API-style response.
@@ -73,16 +81,39 @@ def lambda_handler(event, context):
             "body": "quantity must be greater than 0"
         }
 
+
+    
+
     # Remove unnecessary spaces before using the values.
     customer_name = customer_name.strip()
     item = item.strip()
 
+    order_id = str(uuid.uuid4())
+
+    order = {
+        "orderId": order_id,
+        "customerName": customer_name,
+        "item": item,
+        "quantity": quantity
+    }
+
+    response = table.put_item(Item=order)    
+    print(response)
     # Return a successful response.
     # The order is not stored in DynamoDB yet.
-    return {
-        "statusCode": 201,
-        "body": (
-            f"Created order for {customer_name}: "
-            f"{quantity} {item}"
-        )
-    }
+    return order
+    # return {
+    #     "statusCode": 201,
+    #     "body": (
+    #         f"Created order for {customer_name}: "
+    #         f"{quantity} {item}"
+    #     )
+    # }
+
+test_event = {
+    "customerName": "Ahmed",
+    "item": "Cheese Pizza",
+    "quantity": 2
+}
+
+print(lambda_handler(test_event, None))
