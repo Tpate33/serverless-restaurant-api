@@ -1,3 +1,4 @@
+import json
 import uuid
 import boto3
 
@@ -5,6 +6,7 @@ import boto3
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("RestaurantOrders")
+
 
 def lambda_handler(event, context):
     """
@@ -17,12 +19,13 @@ def lambda_handler(event, context):
         "quantity": 2
     }
     """
+    body = json.loads(event.get("body"))
 
     # Safely retrieve each value from the incoming request.
     # .get() returns None when a key is missing.
-    customer_name = event.get("customerName")
-    item = event.get("item")
-    quantity = event.get("quantity")
+    customer_name = body.get("customerName")
+    item = body.get("item")
+    quantity = body.get("quantity")
 
     # Validate the customer's name.
     if customer_name is None:
@@ -111,9 +114,7 @@ def lambda_handler(event, context):
     # }
 
 test_event = {
-    "customerName": "Ahmed",
-    "item": "Cheese Pizza",
-    "quantity": 2
+    "body": '{"customerName":"Ahmed","item":"Cheese Pizza","quantity":2}'
 }
 
 print(lambda_handler(test_event, None))
