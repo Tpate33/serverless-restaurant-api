@@ -98,13 +98,30 @@ def lambda_handler(event, context):
         "customerName": customer_name,
         "item": item,
         "quantity": quantity
+
     }
 
     response = table.put_item(Item=order)    
     print(response)
+    
+    return {
+        "statusCode": 201,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": json.dumps({
+            "orderId": order_id,
+            "customerName": customer_name,
+            "item": item,
+            "quantity": quantity
+        })
+    }
+
+    
+    
+    
     # Return a successful response.
     # The order is not stored in DynamoDB yet.
-    return order
     # return {
     #     "statusCode": 201,
     #     "body": (
